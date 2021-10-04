@@ -42,7 +42,7 @@ def recorrer_df(df,diccionario):
     
     #Operadores para tener en cuenta en una operacion aritmetica
     x="Operacion Aritmetica"
-    y="Delimitar"
+    #y="Delimitar"
     
     
     #Lista para almacenar los componentes de la operacion
@@ -67,7 +67,7 @@ def recorrer_df(df,diccionario):
         
         
         #comprobar donde halla un simbolo operador o separador
-        elif x in df.iloc[i].tolist() or y in df.iloc[i].tolist() :
+        elif x in df.iloc[i].tolist()  :
             #agregar el simbolo y token pasado a la variable auxiliar y ubicacion
             aux.append(df.iloc[i-1,0])
             aux.append(df.iloc[i,0])
@@ -89,7 +89,7 @@ def recorrer_df(df,diccionario):
                 #Si es un identificador se agrega al auxiliar
                 #Si no es ninguno no es una expresion
                 if sep:
-                    if x in df.iloc[i].tolist() or y in df.iloc[i].tolist() :
+                    if x in df.iloc[i].tolist():
                         flag=False
                     elif df.iloc[i,1]=='Identificador':
                         aux.append(df.iloc[i,0])
@@ -104,7 +104,7 @@ def recorrer_df(df,diccionario):
                 else:
                     if df.iloc[i,1]=='Identificador':
                         flag=False
-                    elif x in df.iloc[i].tolist() or y in df.iloc[i].tolist() :
+                    elif x in df.iloc[i].tolist() :
                         aux.append(df.iloc[i,0])
                         sep=True
                         i+=1
@@ -182,12 +182,12 @@ def main(archivoTexto):
     
     
     #convertir el Dataframe en un archivo en excel
-    df.to_excel('tabla_operadores.xlsx','final',index=False)
+    #df.to_excel('tabla_operadores.xlsx','final',index=False)
     
     
     
     #convertir el Dataframe en un archivo .csv
-    df.to_csv('tabla_operadores.csv',index=False)
+    df.to_csv('tabla_operaciones.csv',index=True)
     
     
 

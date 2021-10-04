@@ -33,7 +33,28 @@ def analizar_cadena(cadena,diccionario,x,y,lista_simbolos,df_simbolos):
     Funcion que analiza la cadena e identifica si es un simbolo o un identificador
     y lo agrega al diccionario
     Recibe como parametros la cadena,el diccionario, las listas con los 
-    nombres y la posicion x y y """
+    nombres y la posicion x y y
+
+    Parameters
+    ----------
+    cadena : string
+        cadena de caracteres a analizar.
+    diccionario : dict
+        Diccionario donde se guarda la informacion obtenida.
+    x : int
+        posicion x del caracter en el texto
+    y : int
+        posicion y del caracter en el texto
+    lista_simbolos : list
+        lista de todos los nombres del simbolo
+    df_simbolos : dataframe
+        Dataframe donde se almacena la informacion de los simbolos
+
+    Returns
+    -------
+    None.
+
+    """
     
     #comprobar que el string no este vacio 
     if not cadena.strip():
@@ -62,7 +83,25 @@ def recorrer_archivo(nombre_codigo,diccionario,df_simbolos,lista_simbolos):
     """
     Funcion para recorrer el archivo, que recibe como parametro el archivo y
     Se recorre linea por linea y caracter por caracter el archivo como una 
-    cadena de texto"""
+    cadena de texto
+
+    Parameters
+    ----------
+    nombre_codigo : string
+        Nombre del archivo .txt con el codigo a analizar
+    diccionario : dict
+        DESCRIPTION.
+    df_simbolos : dataframe
+        Dataframe donde se almacena los datos recogidos.
+    lista_simbolos : list
+        Lista con el nombre de los diferentes simbolos.
+
+    Returns
+    -------
+    diccionario : dict
+        DESCRIPTION.
+
+    """
     texto=open(nombre_codigo,'r')
     #variable contadora de la cantidad de renglones tiene el texto
     y=0
@@ -151,6 +190,7 @@ def main(archivoTexto):
     #Crear el diccionario donde se va almacenar la informacion
     dict_analizador={"Simbolo":[],"Ubicacion":[],"Tipo1":[],"Tipo2":[],"Tipo3":[]}
     
+    
     #llamar a la funcion para rellenar el diccionario con simbolos e identificador
     dict_analizador=recorrer_archivo(archivoTexto,dict_analizador,df_simbolos,
                                  simbolos)
@@ -166,7 +206,7 @@ def main(archivoTexto):
     
     
     #convertir el Dataframe en un archivo en excel
-    df.to_excel('tablaSimbolos.xlsx','final',index=False)
+    #df.to_excel('tablaSimbolos.xlsx','final',index=False)
     
     
     

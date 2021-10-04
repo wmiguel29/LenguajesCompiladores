@@ -1,0 +1,48 @@
+package practica;
+
+import java.util.LinkedList;
+import java.util.Queue;
+
+public class Practica {
+	
+	public static void identificarP(String texto) {
+		
+		Queue<String> palabras=new LinkedList<String>();
+		Queue<Integer> indexes=new LinkedList<Integer>();
+		String separadores="*=+-/ ";
+		String str="";
+		String palabrasb="whileiffor";
+		for (int i = 0; i < texto.length(); i++) {
+			String c=Character.toString(texto.charAt(i));
+			if(separadores.contains(c) || i==texto.length()-1) {
+				if(i==texto.length()-1)
+					str+=c;
+				if(palabrasb.contains(str)) {
+					palabras.add(str);
+					indexes.add(i-str.length()+1);
+					str="";
+				}else {
+					str="";
+				}
+			}else {
+				str+=texto.charAt(i);
+			}
+			
+		}
+		
+		while(!palabras.isEmpty()) {
+			System.out.println("La palabra " +palabras.poll()+" esta en la posicion "+indexes.poll());
+		}
+		
+	}
+	
+	public static void main(String[] args) {
+		String str="Mimama for while hola*if*while";
+		identificarP(str);
+	}
+	
+	20+10
+	40-20
+	10.5+16.4
+
+}

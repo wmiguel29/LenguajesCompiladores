@@ -34,18 +34,40 @@ def analizar_cadena(cadena,diccionario,lista_simbolos,df_simbolos):
     Funcion que analiza la cadena e identifica si es un Token 
     y lo agrega al diccionario, con su ID
     Recibe como parametros la cadena,el diccionario, las listas con los 
-    nombres """
+    nombres
+
+    Parameters
+    ----------
+    cadena : string
+        cadena para ser analizada
+    diccionario : dict
+        Diccionario donde se almacena la informacion recolectada
+    lista_simbolos : list
+        Lista con el nombre de los simbolos
+    df_simbolos : dataframe
+        Dataframe donde se almacena la informacion de los simbolos
+
+    Returns
+    -------
+    None.
+
+    """
+
     
     #comprobar que el string no este vacio 
     if not cadena.strip():
         pass    
+    
     #Agregar el espacio y enter
     elif cadena=='Enter'or cadena=='Espacio':
+    
         index=lista_simbolos.index(cadena)
         #agregar el token al diccionario con los datos del Dataframe
         diccionario['Token'].append(df_simbolos.iloc[index,1])
         diccionario['TokenID'].append(df_simbolos.iloc[index,0])
         diccionario['Lexema'].append('')
+        
+        
     #comprobar que la cadena si este en la lista de tokens
     elif cadena in lista_simbolos:
         index=lista_simbolos.index(cadena)
@@ -53,6 +75,8 @@ def analizar_cadena(cadena,diccionario,lista_simbolos,df_simbolos):
         diccionario['Token'].append(df_simbolos.iloc[index,1])
         diccionario['TokenID'].append(df_simbolos.iloc[index,0])
         diccionario['Lexema'].append(cadena)
+    
+    
     else:
         #agregar el identificador al diccionario 
         diccionario['Lexema'].append(cadena)
@@ -66,49 +90,88 @@ def recorrer_archivo(nombre_codigo,diccionario,df_simbolos,lista_simbolos):
     """
     Funcion para recorrer el archivo, que recibe como parametro el archivo y
     Se recorre linea por linea y caracter por caracter el archivo como una 
-    cadena de texto"""
+    cadena de texto
+
+    Parameters
+    ----------
+    nombre_codigo : string
+        Nombre del archivo .txt con el codigo a analizar
+    diccionario : dict
+        DESCRIPTION.
+    df_simbolos : dataframe
+        Dataframe donde se almacena los datos recogidos.
+    lista_simbolos : list
+        Lista con el nombre de los diferentes simbolos.
+
+    Returns
+    -------
+    diccionario : dict
+        Dictionario con la informacion recolectada
+
+    """
+    
     texto=open(nombre_codigo,'r')
     #variable contadora de la cantidad de renglones tiene el texto
     y=0
+    
     #variable acumuladora de caracteres que se va recorriendo
     aux=''
+    
     #recorrer el archivo linea por linea
     for linea in texto:
+        
         #recorrer byte por byte cada linea o cadena de texto del archivo
             for i in range(len(linea)):
+                
                 #comprobar la ultima posicion de la cadena, buscando si hay 
                 #simbolo y agregar el salto de linea
                 if i == len(linea)-1:
+                    
                     analizar_cadena(aux,diccionario,lista_simbolos,
                                     df_simbolos)
                     analizar_cadena('Enter',diccionario,lista_simbolos,
                                     df_simbolos)
                     #reiniciar el acumulador para la nueva linea
                     aux=''
+                    
+                    
                 #comprobar si el caracter es un simbolo o espacio
                 elif linea[i] in lista_simbolos or linea[i]==' ':
+                    
                     #clasificar y agregar el acumulador como identificador
                     #o simbolo
                     analizar_cadena(aux,diccionario,lista_simbolos,
                                     df_simbolos)
+                    
                     #si es un espacio agregar a la tabla como 'Espacio'
                     if linea[i] == ' ':
                         analizar_cadena('Espacio',diccionario,
                                         lista_simbolos,df_simbolos)
+                        
                     else:
                         #agregar a la tabla el simbolo 
                         analizar_cadena(linea[i],diccionario,
                                         lista_simbolos,df_simbolos)
+                        
                     #vaciar el acumulador para una nueva combinacion de
                     #caracteres
                     aux=''
+                    
+                    
                 else:
                     #si no es un simbolo, agregar el caracter al acumulador
                     aux+=linea[i]
+                    
+                    
             #aumentarle 1 al contador de filas
             y+=1
+            
+            
     #devolver el diccionario
     return diccionario
+
+
+
 
 def main(archivoTexto):
     '''
@@ -168,7 +231,7 @@ def main(archivoTexto):
     
     
     #convertir el Dataframe en un archivo en excel
-    df.to_excel('tablatokens.xlsx','final',index=False)
+    #df.to_excel('tablatokens.xlsx','final',index=False)
     
     
     
