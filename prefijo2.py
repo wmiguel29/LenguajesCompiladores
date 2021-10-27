@@ -4,7 +4,12 @@ Created on Thu Sep 30 18:29:10 2021
 
 Codigo base en Python 3.8.5 que contiene la codificacion de la Gramatica Libre 
 de Contexto(GLC) basica utilizada en clase para la mayoria de los ejercicios
-de clase 
+de clase, lo unico que no tiene es el manejo de los errores y adicionalmente 
+tiene diferentes acciones semanticas que permiten la conversion de una 
+expresion infija a posfija. La unica condicion es que la gramatica acepte 
+y este bien escrita la expresion para que funcione a la perfeccion. Lo que se 
+hace es que se cuarda en una lista los tokens analizados y guardados en
+postorden para despues mostrarlos al usuario
 
 GLC ORIGINAL:
     <EXP>  := <EXP> + <TERMIN>
@@ -26,29 +31,29 @@ GLC ORIGINAL:
              | g | h | i | j | k | l | m | n | o | p | q | r | s | t | u | v 
              | w | y | x | z
             
-GLC SIN RESURSIVIDAD: 
+GLC SIN RESURSIVIDAD CON  ACCIONES SEMANTICAS : 
     <EXPR> := <TERM><EXPR`>
-    <EXPR`> := + <TERM> <EXPR`>
-             | - <TERM> <EXPR`>
+    <EXPR`> := + <TERM> {Save '+'} <EXPR`> 
+             | - <TERM> {Save '-'} <EXPR`> 
              | ε 
     <TERM> := <FACT> <TERM`>
-    <TERM`> := *<FACT> <TERM`>
-             | /<FACT> <TERM`>
+    <TERM`> := *<FACT> {Save '*'} <TERM`> 
+             | /<FACT> {Save '/'} <TERM`> 
              | ε
-    <FACT> := (<EXPR>)
+    <FACT> := (<EXPR>)  
             | <NUMS>
             | <IDENT>
-    <NUMS> := <DIGT> <NUMS`>
+    <NUMS> := <DIGT> <NUMS`> {Save ' '}
     <NUMS`> := <DIGT> <NUMS`>
              | ε
-    <DIGT> := 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 0
-    <IDENT> := <LETRA> <IDENT`>
+    <DIGT> := 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 0 {Save 'Digito'}
+    <IDENT> := <LETRA> <IDENT`> {Save ' '}
     <IDENT`> := <LETRA> <IDENT`>
              | ε
     <LETRA> := A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P 
              | Q | R | S | T | U | V | W | Y | X | Z | a | b | c | d | e | f 
              | g | h | i | j | k | l | m | n | o | p | q | r | s | t | u | v 
-             | w | y | x | z
+             | w | y | x | z  {Save 'Letra'}
 
 @author: Miguel Wagner
 """
@@ -71,11 +76,17 @@ posfija = []
 cadena=''
 
 
-#Definir lista donde se van a guardar los errores
-errores=[]
+#lista que es la que utilizo como pila
+preAux = []
+
+
+#
+acumAux = ''
+
 
 
 #No Terminales
+
 def expresion():
     termino()
     expresion_prima()
@@ -86,31 +97,43 @@ def expresion_prima():
         #print('+')
         match('+')
         termino()
-        expresion_prima() 
+        prefixBuilder('+ ')
+        #posfija.append('+')
+        #posfija.append(' ')
+        expresion_prima()
     elif token_entrada=='-':
        # print('-')
         match('-')
         termino()
+        prefixBuilder('- ')
+        #posfija.append('-')
+        #posfija.append(' ')
         expresion_prima()
     else:
         pass
-   
+    
     
 def termino():
     factor()
     termino_prima()
-   
+  
     
 def termino_prima():
     if token_entrada =='*':
         #print('*')
         match('*')
         factor()
+        prefixBuilder('* ')
+        #posfija.append('*')
+        #posfija.append(' ')
         termino_prima()
     elif token_entrada =='/':
         #print('/')
         match('/')
         factor()
+        prefixBuilder('/ ')
+        #posfija.append('/')
+        #posfija.append(' ')
         termino_prima()
     else:
         pass
@@ -123,24 +146,23 @@ def factor():
         #print ("(")
         match('(')
         expresion()
-        print (")")
+        #print (")")
         match(')')
     elif  isdigit(token_entrada):
         numero()
     elif  isalpha(token_entrada):
         identificador()
     else:
-        error="Se esperaba un factor en la posicion : "+str(posicion-1)
-        error+=", se obtuvo " + token_entrada
-        errores.append(error)
         token_entrada=siguienteToken()
     
     
- 
-#Terminales o que contienen Terminales
+ # Terminales o que Contienen Terminales   
 def identificador():
+    global acumAux
     letra()
     identificador_prima()
+    preAux.append(acumAux + " ");acumAux = ""
+    
     
     
 def identificador_prima():
@@ -149,30 +171,31 @@ def identificador_prima():
         letra()
         identificador_prima()
     elif  isdigit(token_entrada):
-        error="Se esperaba una letra y se obtuvo " + token_entrada
-        error+= ", en la posicion " + str(posicion-1)
-        errores.append(error)
         token_entrada=siguienteToken()
         identificador_prima()
     elif token_entrada is None:
         pass
+    else :
+        pass
     
 
 def letra():
-    global token_entrada
+    global token_entrada, acumAux
     if isalpha(token_entrada):
-        print(token_entrada)
+        #print(token_entrada)
+        token=token_entrada
         match(token_entrada)
+        #posfija.append(token)
+        acumAux += token
     else:
-        error="Se esperaba un digito se obtuvo: " + token_entrada
-        error+= ", en la posicion " + str(posicion-1)
-        errores.append(error)
         token_entrada=siguienteToken()
             
 
 def numero():
+    global acumAux
     digito()
     numero_prima()
+    preAux.append(acumAux + " "); acumAux = ""
     
     
 def numero_prima():
@@ -181,9 +204,6 @@ def numero_prima():
         digito()
         numero_prima()
     elif  isalpha(token_entrada):
-        error="Se esperaba un numero y se obtuvo " + token_entrada
-        error+= ", en la posicion " + str(posicion-1)
-        errores.append(error)
         token_entrada=siguienteToken()
         numero_prima()
     elif token_entrada is None:
@@ -191,16 +211,18 @@ def numero_prima():
   
 
 def digito():
-    global token_entrada
+    global token_entrada, acumAux
     if isdigit(token_entrada):
-        print(token_entrada)
+        #print(token_entrada)
+        token=token_entrada
         match(token_entrada)
+        #posfija.append(token)
+        acumAux += token
     else:
-        error="Se esperaba un digito se obtuvo: " + token_entrada
-        error+= ", en la posicion " + str(posicion-1)
-        errores.append()
         token_entrada=siguienteToken()
         
+
+
 #Funciones Complementarias
 def siguienteToken():
     global posicion
@@ -216,9 +238,6 @@ def match(caracter):
     if caracter == token_entrada:
         token_entrada=siguienteToken()
     else:
-        error="Se esperaba " + caracter + " se obtuvo " + token_entrada
-        error+=", en la posicion : " + str(posicion-1)
-        errores.append
         token_entrada=siguienteToken()
         
         
@@ -238,15 +257,69 @@ def isalpha(caracter):
         return True
     else:
         return False
+    
+    
+def prefixBuilder(operator: str) -> str:
+        b = preAux.pop()
+        a = preAux.pop() 
+        preAux.append(operator + a + b)
+    
+    
+    
+ 
+def listToString(s):
+    """
+    Function para convertir una lista en un String
 
+    Parameters
+    ----------
+    s : Lista
+        Lista donde se almacenaron todos los tokens
+
+    Returns
+    -------
+    str1 : String
+        Expresion 
+
+    """
+    
+    # initialize an empty string
+    str1 = "" 
+    
+    # traverse in the string  
+    for ele in s: 
+        str1 += ele  
+    
+    # return string  
+    return str1 
         
-
 def main(numero= None, expresionA = ''):
+    """
+    Recibe un numero o una expresion, si recibe un numero busca la 
+    expresion con ese numero en la tabla de expresiones aritmeticas y empieza
+    a recorrer el algoritmo con esta; si por el contrario recibe una expresion
+    recorre el algoritmo con esta.
+
+    Parameters
+    ----------
+    numero : int, optional
+        Numero de la expresion del Dataframe. The default is None.
+    expresion : String, optional
+        Expresion a analizar. The default is ''.
+
+    Returns
+    -------
+    String con la expresion PostFija
+
+    """
     
     
     if numero:
+        
         #Si entra como string trasnformarlo a un int
         numero=int(numero)
+        
+        
         
         #leer y almacenar la tabla con las operaciones en un dataframe
         df_operaciones=pd.read_csv('tabla_operaciones.csv')
@@ -258,16 +331,18 @@ def main(numero= None, expresionA = ''):
         
         #Buscar la expresion especifica
         texto=df_operaciones.iloc[numero,1]
-        texto=str(texto)
+        
     else:
+        
         texto = expresionA
-    
-    
+            
+
+
+
+    #texto ='u*u-(a+a*a)'
     #texto="a + b * c *(votos/electores) * 1000*x*x + b*x + c *(alto - bajo)/2 *3600 + minutos*60 + segundos numero%2 "
-    #Quitar los espacios en blanco de la cadena
+    #Quitar todos los espacios de la cadena
     cadena=texto.replace(' ','')
-    cadena.lstrip()
-    
     
     #Referenciar el token de Entrada a nivel global
     global token_entrada
@@ -276,27 +351,24 @@ def main(numero= None, expresionA = ''):
     token_entrada=siguienteToken()
     
     
+    
     #Llamar a la primera regla de derivacion
     expresion()
     
     
-    #Si hay errores insertar en la primera posicion la cadena original
-    if errores:
-        errores.insert(0,cadena+'\n')
-        return errores
+    #print(listToString(preAux))
     
-    #Si no hay errores retornar una lista con la cadena y un String que
-    #diga expresion correcta
-    else:
-        return [cadena,"Expresion Correcta"]
+    
+    return listToString(preAux)
     
     
     
+ 
 
 
 
     
-
+    
     
 
 

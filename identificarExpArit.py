@@ -119,7 +119,10 @@ def recorrer_df(df,diccionario):
             if len(aux)>2:
                 for w in aux:
                   v+=w
-                diccionario['Expresion'].append(v)
+                v.strip()
+                v.lstrip()
+                expresion=v.replace(' ','')
+                diccionario['Expresion'].append(expresion)
                 aux.clear()
                 
                 

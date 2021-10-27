@@ -1,0 +1,8 @@
+u*u-(a+a*a)
+a + b * c *(votos/electores) * 1000*x*x + b*x + c *(alto - bajo)/2 *3600 + minutos*60 + segundos numero/2
+(5+(26-87*5)*2)-(32*(4-16*13))
+
+
+
+
+a + b * c *(votos/electores) * 100 a*x*x + b*x + c *(alto - bajo)/2 horas*3600 + minutos*60 + segundos numero%2 
